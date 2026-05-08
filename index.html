@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reloj de Partido</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #timer {
+      font-size: 90px;
+      margin-bottom: 20px;
+    }
+    button {
+      font-size: 22px;
+      padding: 12px 26px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+    }
+    .start { background: #2ecc71; }
+    .pause { background: #f1c40f; }
+    .reset { background: #e74c3c; }
+  </style>
+</head>
+<body>
+
+  <div id="timer">10:00</div>
+
+  <div>
+    <button class="start" onclick="start()">Iniciar</button>
+    <button class="pause" onclick="pause()">Pausar</button>
+    <button class="reset" onclick="reset()">Reiniciar</button>
+  </div>
+
+  <script>
+    let totalSeconds = 10 * 60; // 10 minutos
+    let secondsLeft = totalSeconds;
+    let interval = null;
+
+    function format() {
+      const m = Math.floor(secondsLeft / 60);
+      const s = secondsLeft % 60;
+      document.getElementById("timer").innerText =
+        String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+    }
+
+    function start() {
+      if (interval) return;
+      interval = setInterval(() => {
+        if (secondsLeft > 0) {
+          secondsLeft--;
+          format();
+        }
+      }, 1000);
+    }
+
+    function pause() {
+      clearInterval(interval);
+      interval = null;
+    }
+
+    function reset() {
+      pause();
+      secondsLeft = totalSeconds;
+      format();
+    }
+
+    format();
+  </script>
+
+</body>
+</html>
