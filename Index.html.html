@@ -1,0 +1,89 @@
+<audio id="alarm-sound">
+    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+</audio>
+
+<script>
+    let timerInterval = null;
+    const alarm = document.getElementById("alarm-sound");
+
+    function updateDisplay(seconds) {
+        let minutes = Math.floor(seconds / 60);
+        let secs = seconds % 60;
+        document.getElementById("timer").textContent =
+            `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function loadState() {
+        const endTime = localStorage.getItem("endTime");
+        if (!endTime) return;
+
+        const remaining = Math.floor((endTime - Date.now()) / 1000);
+
+        if (remaining > 0) {
+            updateDisplay(remaining);
+            startCountdown();
+        } else {
+            localStorage.removeItem("endTime");
+            updateDisplay(0);
+        }
+    }
+
+    function startCountdown() {
+        clearInterval(timerInterval);
+
+        timerInterval = setInterval(() => {
+            const endTime = localStorage.getItem("endTime");
+            const remaining = Math.floor((endTime - Date.now()) / 1000);
+
+            if (remaining > 0) {
+                updateDisplay(remaining);
+            } else {
+                clearInterval(timerInterval);
+                localStorage.removeItem("endTime");
+                updateDisplay(0);
+                alarm.play();   // 🔔 Suena la alarma
+            }
+        }, 1000);
+    }
+
+    function startTimer() {
+        const current = document.getElementById("timer").textContent.split(":");
+        const totalSeconds = parseInt(current[0]) * 60 + parseInt(current[1]);
+
+        if (totalSeconds <= 0) return;
+
+        const endTime = Date.now() + totalSeconds * 1000;
+        localStorage.setItem("endTime", endTime);
+
+        startCountdown();
+    }
+
+    function pauseTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+
+        const current = document.getElementById("timer").textContent.split(":");
+        const totalSeconds = parseInt(current[0]) * 60 + parseInt(current[1]);
+
+        localStorage.setItem("endTime", Date.now() + totalSeconds * 1000);
+    }
+
+    function resetTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        localStorage.removeItem("endTime");
+        updateDisplay(0);
+    }
+
+    function setTime(minutes) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+
+        const seconds = minutes * 60;
+        updateDisplay(seconds);
+
+        localStorage.setItem("endTime", Date.now() + seconds * 1000);
+    }
+
+    loadState();
+</script>
